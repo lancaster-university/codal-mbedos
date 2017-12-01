@@ -1,80 +1,51 @@
+/*
+The MIT License (MIT)
+
+Copyright (c) 2017 Lancaster University.
+
+Permission is hereby granted, free of charge, to any person obtaining a
+copy of this software and associated documentation files (the "Software"),
+to deal in the Software without restriction, including without limitation
+the rights to use, copy, modify, merge, publish, distribute, sublicense,
+and/or sell copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
+*/
+
 #include "MbedTimer.h"
 #include "CodalCompat.h"
 #include "Timer.h"
+#include "CodalConfig.h"
+#include "codal_target_hal.h"
 
 #include "CodalDmesg.h"
-#include "nrf.h"
-#define MINIMUM_PERIOD  1
-
-static codal::_mbed::Timer *instance = NULL;
-
-void NRF_TIMER1_irq()
-{
-    bool isFallback = false;
-
-    if (NRF_TIMER1->EVENTS_COMPARE[0] && NRF_TIMER1->INTENSET & TIMER_INTENSET_COMPARE0_Msk)
-    {
-        isFallback = true;
-        NRF_TIMER1->EVENTS_COMPARE[0] = 0;
-    }
-
-    if(NRF_TIMER1->EVENTS_COMPARE[1] && NRF_TIMER1->INTENSET & TIMER_INTENSET_COMPARE1_Msk)
-    {
-        // NRF_TIMER1->INTENCLR = (TIMER_INTENSET_COMPARE1_Enabled << TIMER_INTENSET_COMPARE1_Pos);
-        NRF_TIMER1->EVENTS_COMPARE[1] = 0;
-    }
-
-    if (instance)
-    {
-        instance->syncRequest();
-        if (isFallback) {
-            instance->sigma = 0;
-            NRF_TIMER1->TASKS_CLEAR = 1;
-        }
-        instance->trigger();
-    }
-}
-
+#define MINIMUM_PERIOD  32
 
 namespace codal
 {
     namespace _mbed
     {
+        void Timer::triggered()
+        {
+            timeout.attach_us(callback(this, &Timer::triggered), this->period);
+            this->trigger();
+        }
 
         Timer::Timer() : codal::Timer()
         {
-            this->period = 10000000; // 10s fallback timer
-            instance = this;
-
-            // Timers use the HFCLK,
-            NRF_CLOCK->EVENTS_HFCLKSTARTED = 0;
-            NRF_CLOCK->TASKS_HFCLKSTART = 1;
-            while(NRF_CLOCK->EVENTS_HFCLKSTARTED == 0);
-
-            NRF_TIMER1->TASKS_STOP = 1;
-
-            // 1 us precision.
-            NRF_TIMER1->MODE = TIMER_MODE_MODE_Timer;
-            NRF_TIMER1->TASKS_CLEAR = 1;
-            NRF_TIMER1->PRESCALER = 4;
-
-            // 32 bit comparisons...
-            NRF_TIMER1->BITMODE = TIMER_BITMODE_BITMODE_32Bit;//0x0003;
-
-            // configure our well defined period for definitive interrupts.
-            NRF_TIMER1->CC[0] = this->period;
-
-            // enable compare for channels 0 and 1
-            NRF_TIMER1->INTENSET = (TIMER_INTENSET_COMPARE0_Enabled << TIMER_INTENSET_COMPARE0_Pos);
-            // configure automatic clear.
-            // NRF_TIMER1->SHORTS = 0;
-
-            NVIC_SetVector(TIMER1_IRQn, (uint32_t) NRF_TIMER1_irq);
-            NVIC_SetPriority(TIMER1_IRQn,0);
-            NVIC_ClearPendingIRQ(TIMER1_IRQn);
-            NVIC_EnableIRQ(TIMER1_IRQn);
-
-            NRF_TIMER1->TASKS_START = 1;
+            this->period = 10000;
+            timer.start();
+            timeout.attach_us(callback(this, &Timer::triggered), this->period);
         }
 
         /**
@@ -87,28 +58,19 @@ namespace codal
             if (t < MINIMUM_PERIOD)
                 t = MINIMUM_PERIOD;
 
-            NVIC_DisableIRQ(TIMER1_IRQn);
-            NRF_TIMER1->CC[1] = t;
-            NRF_TIMER1->INTENSET = (TIMER_INTENSET_COMPARE1_Enabled << TIMER_INTENSET_COMPARE1_Pos);
-            sigma = 0;
-            NRF_TIMER1->TASKS_CLEAR = 1;
-            NVIC_EnableIRQ(TIMER1_IRQn);
+            timeout.detach();
+            timeout.attach_us(callback(this, &Timer::triggered), t);
         }
-
         /**
          * request to the physical timer implementation code to trigger immediately.
          */
         void Timer::syncRequest()
         {
-            NVIC_DisableIRQ(TIMER1_IRQn);
-            NRF_TIMER1->TASKS_CAPTURE[2] = 1;
-            uint32_t snapshot = NRF_TIMER1->CC[2];
-            uint32_t elapsed = snapshot - sigma;
-            sigma = snapshot;
-            NVIC_EnableIRQ(TIMER1_IRQn);
-
-            //DMESGF("%d", elapsed);
+            disableInterrupts();
+            int elapsed = timer.read_us();
+            timer.reset();
             this->sync(elapsed);
+            enableInterrupts();
         }
     }
 }

@@ -1,7 +1,7 @@
 /*
 The MIT License (MIT)
 
-Copyright (c) 2016 Lancaster University, UK.
+Copyright (c) 2017 Lancaster University, UK.
 
 Permission is hereby granted, free of charge, to any person obtaining a
 copy of this software and associated documentation files (the "Software"),
@@ -22,44 +22,41 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef TIMED_INTERRUPT_H
-#define TIMED_INTERRUPT_H
-
-#include "mbed.h"
 #include "CodalConfig.h"
+#include "MbedTimedInterruptIn.h"
 
 namespace codal
 {
     namespace _mbed
     {
-        class TimedInterruptIn : public InterruptIn
+        /**
+          * Constructor.
+          *
+          * Create an instance of TimedInterruptIn that has an additional timestamp field.
+          */
+        TimedInterruptIn::TimedInterruptIn(PinName name) : InterruptIn(name)
         {
-            uint64_t timestamp;
+            timestamp = 0;
+        }
 
-            public:
+        /**
+          * Stores the given timestamp for this instance of TimedInterruptIn.
+          *
+          * @param timestamp the timestamp to retain.
+          */
+        void TimedInterruptIn::setTimestamp(uint64_t timestamp)
+        {
+            this->timestamp = timestamp;
+        }
 
-            /**
-              * Constructor.
-              *
-              * Create an instance of TimedInterruptIn that has an additional timestamp field.
-              */
-            TimedInterruptIn(PinName name);
-
-            /**
-              * Stores the given timestamp for this instance of TimedInterruptIn.
-              *
-              * @param timestamp the timestamp to retain.
-              */
-            void setTimestamp(uint64_t timestamp);
-
-            /**
-              * Retrieves the retained timestamp for this instance of TimedInterruptIn.
-              *
-              * @return the timestamp held by this instance.
-              */
-            uint64_t getTimestamp();
-        };
+        /**
+          * Retrieves the retained timestamp for this instance of TimedInterruptIn.
+          *
+          * @return the timestamp held by this instance.
+          */
+        uint64_t TimedInterruptIn::getTimestamp()
+        {
+            return timestamp;
+        }
     }
 }
-
-#endif
