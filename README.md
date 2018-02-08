@@ -1,11 +1,8 @@
 # codal-mbedos
 
-The repo contains a mapping of the codal APIs onto ARM's mbed os. Use this repo as a codal target for devices that are mbed enabled.
-
+This library is a binary build of mbedos, and the necessary include files to enable it's use. This is provided here to reduce code size and complexity in the common case (as mbedos source is rather large). The repo also contains a mapping of the codal APIs onto ARM's mbed os.
 
 ## Generating Object Files
-
-This library is a binary build of mbedos, and the necessary include files to enable it's use. This is provided here to reduce code size and complexity in the common case (as mbedos source is rather large).
 
 To extract binary files for a new target, follow these steps:
 
