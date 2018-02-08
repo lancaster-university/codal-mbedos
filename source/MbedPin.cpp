@@ -309,7 +309,7 @@ namespace codal
             }
 
             //perform a read!
-            return (((AnalogIn *)pin)->read_u16() >> 2);
+            return (((AnalogIn *)pin)->read_u16() >> 6);
         }
 
         /**
