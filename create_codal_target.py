@@ -59,7 +59,7 @@ def generate_o(infilename, outdir) :
             else :
                 obj = item
 
-            cmd = "cp " + obj + " " + outdir
+            cmd = ["cp", obj, outdir]
             print(cmd)
             call (cmd)
 
@@ -102,7 +102,7 @@ def generate_includes(infilename, outdir) :
     for item in dirs :
         out = outdir + item
         create_dir(out)
-        cmd = ["cp"] + [item + "/*.h"] + [out]
+        cmd = ["sh", "-c", "cp " + item + "/*.h " + out]
 
         headers = [f for f in listdir(item) if f.endswith(".h")]
 
