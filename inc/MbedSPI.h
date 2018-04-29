@@ -37,7 +37,7 @@ namespace codal
 /**
  * Class definition for SPI service, derived from ARM mbed.
  */
-class MbedSPI : private mbed::SPI, public codal::SPI
+class MbedSPI : protected mbed::SPI, public codal::SPI
 {
 public:
     /**
