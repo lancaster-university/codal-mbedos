@@ -26,6 +26,7 @@ DEALINGS IN THE SOFTWARE.
 #include "MbedSPI.h"
 #include "ErrorNo.h"
 #include "CodalDmesg.h"
+#include "codal-core/inc/driver-models/Timer.h"
 
 namespace codal
 {
@@ -84,47 +85,5 @@ int MbedSPI::write(int data)
     return (ret >= 0) ? ret : DEVICE_SPI_ERROR;
 }
 
-typedef void (*PVoidIntCallback)(void *, int);
-
-int MbedSPI::xfer(uint8_t const *p_tx_buffer, uint16_t tx_length, uint8_t *p_rx_buffer,
-                  uint16_t rx_length, PVoidCallback doneHandler, void *arg)
-{
-    event_callback_t tmp((PVoidIntCallback)doneHandler, arg);
-    doneCb = tmp;
-    int rc = mbed::SPI::transfer(p_tx_buffer, tx_length, p_rx_buffer, rx_length, doneCb);
-    return rc ? DEVICE_SPI_ERROR : DEVICE_OK;
-}
-
-/**
- * Writes a given command to SPI bus, and afterwards reads the response. Finally, calls doneHandler
- * (possibly in IRQ context).
- *
- * Note that bytes recieved while sending command are ignored.
- */
-int MbedSPI::startTransfer(const uint8_t *command, uint32_t commandSize, uint8_t *response,
-                           uint32_t responseSize, void (*doneHandler)(void *), void *arg)
-{
-    if (doneHandler == NULL)
-        return DEVICE_INVALID_PARAMETER;
-
-    if (commandSize && responseSize)
-    {
-        // both command and response, fallback to slow mode
-        return codal::SPI::startTransfer(command, commandSize, response, responseSize, doneHandler,
-                                         arg);
-    }
-    else if (commandSize)
-    {
-        return xfer(command, commandSize, NULL, 0, doneHandler, arg);
-    }
-    else if (responseSize)
-    {
-        return xfer(NULL, 0, response, responseSize, doneHandler, arg);
-    }
-    else
-    {
-        return DEVICE_INVALID_PARAMETER;
-    }
-}
 }
 

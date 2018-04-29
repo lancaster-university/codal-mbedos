@@ -39,9 +39,6 @@ namespace codal
  */
 class MbedSPI : private mbed::SPI, public codal::SPI
 {
-private:
-    event_callback_t doneCb;
-    
 public:
     /**
      * Initialize SPI instance with given pins.
@@ -49,9 +46,6 @@ public:
      * Default setup is 1 MHz, 8 bit, mode 0.
      */
     MbedSPI(codal::Pin &mosi, codal::Pin &miso, codal::Pin &sclk);
-
-    int xfer(uint8_t const *p_tx_buffer, uint16_t tx_length, uint8_t *p_rx_buffer,
-             uint16_t rx_length, PVoidCallback doneHandler, void *arg);
 
     /** Set the frequency of the SPI interface
      *
@@ -84,15 +78,6 @@ public:
      * @return Response from the SPI slave or DEVICE_SPI_ERROR if the the write request failed.
      */
     virtual int write(int data);
-
-    /**
-     * Writes a given command to SPI bus, and afterwards reads the response. Finally, calls
-     * doneHandler (possibly in IRQ context).
-     *
-     * Note that bytes recieved while sending command are ignored.
-     */
-    virtual int startTransfer(const uint8_t *command, uint32_t commandSize, uint8_t *response,
-                              uint32_t responseSize, void (*doneHandler)(void *), void *arg);
 };
 }
 
