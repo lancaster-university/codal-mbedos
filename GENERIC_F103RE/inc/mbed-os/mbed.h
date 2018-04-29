@@ -16,6 +16,8 @@
 #ifndef MBED_H
 #define MBED_H
 
+#include "mbed_config.h"
+
 #define MBED_LIBRARY_VERSION 161
 
 #if MBED_CONF_RTOS_PRESENT
