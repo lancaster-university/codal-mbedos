@@ -30,7 +30,7 @@
 
 #include "events/mbed_shared_queues.h"
 
-using namespace events;
+//using namespace events;
 
 #endif
 
