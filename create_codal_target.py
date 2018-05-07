@@ -140,7 +140,10 @@ create_dir(outputdir)
 create_dir(outputdir+"/obj")
 #
 print("Creating codal-mbedos library...")
+
+# We never used this file
 #generate_lib(linkfilename, outputdir + "/mbedos.o") 
+
 generate_o(linkfilename, outputdir + "/lib") 
 #
 print("Creating codal-mbedos includes...")

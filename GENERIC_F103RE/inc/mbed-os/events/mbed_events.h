@@ -30,6 +30,7 @@
 
 #include "events/mbed_shared_queues.h"
 
+// Conflicts with Codal
 //using namespace events;
 
 #endif
