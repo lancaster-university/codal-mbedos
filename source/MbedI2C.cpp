@@ -50,7 +50,7 @@ namespace codal
             return DEVICE_OK;
         }
 
-         /**
+        /**
           * Issues a standard, 2 byte I2C command write to the accelerometer.
           *
           * Blocks the calling thread until complete.
@@ -67,7 +67,7 @@ namespace codal
             return (ret >= 0) ? DEVICE_OK : DEVICE_I2C_ERROR;
         }
 
-          /**
+         /**
           * Issues a single-byte read command.
           *
           * Blocks the calling thread until complete.

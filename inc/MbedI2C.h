@@ -52,7 +52,7 @@ namespace codal
               */
             int setFrequency(uint32_t frequency);
 
-              /**
+             /**
               * Issues a standard, 2 byte I2C command write to the accelerometer.
               *
               * Blocks the calling thread until complete.
