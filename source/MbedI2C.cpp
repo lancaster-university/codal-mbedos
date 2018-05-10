@@ -35,9 +35,9 @@ namespace codal
         /**
           * Constructor.
           */
-        I2C::I2C(codal::Pin& sda, codal::Pin& scl) : codal::I2C(sda, scl), mbed::I2C((PinName)sda.name, (PinName)scl.name)
+        I2C::I2C(codal::Pin& sda, codal::Pin& scl) : codal::I2C(sda, scl), mb::I2C((PinName)sda.name, (PinName)scl.name)
         {
-
+            setFrequency(100000);
         }
 
         /** Set the frequency of the I2C interface
@@ -46,11 +46,11 @@ namespace codal
           */
         int I2C::setFrequency(uint32_t frequency)
         {
-            mbed::I2C::frequency(frequency);
+            mb::I2C::frequency(frequency);
             return DEVICE_OK;
         }
 
-        /**
+         /**
           * Issues a standard, 2 byte I2C command write to the accelerometer.
           *
           * Blocks the calling thread until complete.
@@ -63,11 +63,11 @@ namespace codal
           */
         int I2C::write(uint8_t data)
         {
-            int ret = mbed::I2C::write(data);
+            int ret = mb::I2C::write(data);
             return (ret >= 0) ? DEVICE_OK : DEVICE_I2C_ERROR;
         }
 
-        /**
+          /**
           * Issues a single-byte read command.
           *
           * Blocks the calling thread until complete.
@@ -76,27 +76,27 @@ namespace codal
           */
         int I2C::read(AcknowledgeType ack)
         {
-            int ret = mbed::I2C::read((ack == AcknowledgeType::ACK) ? 1 : 0);
+            int ret = mb::I2C::read((ack == AcknowledgeType::ACK) ? 1 : 0);
             return (ret >= 0) ? ret : DEVICE_I2C_ERROR;
         }
 
-        /**
+          /**
          * Issues a START condition on the I2C bus
          * @return DEVICE_OK on success, or an error code
          */
         int I2C::start()
         {
-            mbed::I2C::start();
+            mb::I2C::start();
             return DEVICE_OK;
         }
 
-        /**
+         /**
          * Issues a STOP condition on the I2C bus
          * @return DEVICE_OK on success, or an error code
          */
         int I2C::stop()
         {
-            mbed::I2C::stop();
+            mb::I2C::stop();
             return DEVICE_OK;
         }
 

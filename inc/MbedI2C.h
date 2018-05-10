@@ -30,6 +30,8 @@ DEALINGS IN THE SOFTWARE.
 #include "CodalConfig.h"
 #include "codal-core/inc/driver-models/I2C.h"
 
+namespace mb = ::mbed;
+
 namespace codal
 {
     namespace _mbed
@@ -37,7 +39,7 @@ namespace codal
         /**
           * Class definition for I2C service, derived from ARM mbed.
           */
-        class I2C : public codal::I2C, private mbed::I2C
+        class I2C : public codal::I2C, private mb::I2C
         {
             public:
 
@@ -52,7 +54,7 @@ namespace codal
               */
             int setFrequency(uint32_t frequency);
 
-            /**
+              /**
               * Issues a standard, 2 byte I2C command write to the accelerometer.
               *
               * Blocks the calling thread until complete.
@@ -75,7 +77,7 @@ namespace codal
               */
             int read(AcknowledgeType ack = AcknowledgeType::ACK);
 
-            /**
+              /**
              * Issues a START condition on the I2C bus
              * @return DEVICE_OK on success, or an error code
              */
