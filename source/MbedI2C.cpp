@@ -35,9 +35,9 @@ namespace codal
         /**
           * Constructor.
           */
-        I2C::I2C(codal::Pin& sda, codal::Pin& scl) : codal::I2C(sda, scl), mbed::I2C((PinName)sda.name, (PinName)scl.name)
+        I2C::I2C(codal::Pin& sda, codal::Pin& scl) : codal::I2C(sda, scl), mb::I2C((PinName)sda.name, (PinName)scl.name)
         {
-
+            setFrequency(100000);
         }
 
         /** Set the frequency of the I2C interface
@@ -46,11 +46,11 @@ namespace codal
           */
         int I2C::setFrequency(uint32_t frequency)
         {
-            mbed::I2C::frequency(frequency);
+            mb::I2C::frequency(frequency);
             return DEVICE_OK;
         }
 
-        /**
+         /**
           * Issues a standard, 2 byte I2C command write to the accelerometer.
           *
           * Blocks the calling thread until complete.
@@ -59,62 +59,46 @@ namespace codal
           *
           * @param value The value to write.
           *
-          * @return DEVICE_OK on success, DEVICE_I2C_ERROR if the the write request failed.
+          * @return DEVICE_OK on success, DEVICE_I2C_ERROR if the write request failed.
           */
-        int I2C::write(uint32_t address, uint8_t* data, uint32_t len, bool repeated)
+        int I2C::write(uint8_t data)
         {
-            return mbed::I2C::write(address, (const char *)data, len, repeated);
+            int ret = mb::I2C::write(data);
+            return (ret >= 0) ? DEVICE_OK : DEVICE_I2C_ERROR;
         }
 
-        /**
-          * Issues a standard, 2 byte I2C command write to the accelerometer.
+          /**
+          * Issues a single-byte read command.
           *
           * Blocks the calling thread until complete.
           *
-          * @param reg The address of the register to write to.
-          *
-          * @param value The value to write.
-          *
-          * @return DEVICE_OK on success, DEVICE_I2C_ERROR if the the write request failed.
+          * @return the byte on success or DEVICE_I2C_ERROR if the read request failed.
           */
-        int I2C::write(uint32_t address, uint8_t reg, uint8_t value)
+        int I2C::read(AcknowledgeType ack)
         {
-            uint8_t command[2];
-            command[0] = reg;
-            command[1] = value;
-
-            return mbed::I2C::write(address, (const char *)command, 2);
+            int ret = mb::I2C::read((ack == AcknowledgeType::ACK) ? 1 : 0);
+            return (ret >= 0) ? ret : DEVICE_I2C_ERROR;
         }
 
-        /**
-          * Issues a read command, copying data into the specified buffer.
-          *
-          * Blocks the calling thread until complete.
-          *
-          * @param reg The address of the register to access.
-          *
-          * @param buffer Memory area to read the data into.
-          *
-          * @param length The number of bytes to read.
-          *
-          * @return DEVICE_OK on success, DEVICE_INVALID_PARAMETER or DEVICE_I2C_ERROR if the the read request failed.
-          */
-        int I2C::read(uint32_t address, uint8_t reg, uint8_t* buffer, int length)
+          /**
+         * Issues a START condition on the I2C bus
+         * @return DEVICE_OK on success, or an error code
+         */
+        int I2C::start()
         {
-            int result;
-
-            if (buffer == NULL || length <= 0 )
-                return DEVICE_INVALID_PARAMETER;
-
-            result = mbed::I2C::write(address, (const char *)&reg, 1, true);
-            if (result !=0)
-                return DEVICE_I2C_ERROR;
-
-            result = mbed::I2C::read(address, (char *)buffer, length);
-            if (result !=0)
-                return DEVICE_I2C_ERROR;
-
+            mb::I2C::start();
             return DEVICE_OK;
         }
+
+         /**
+         * Issues a STOP condition on the I2C bus
+         * @return DEVICE_OK on success, or an error code
+         */
+        int I2C::stop()
+        {
+            mb::I2C::stop();
+            return DEVICE_OK;
+        }
+
     }
 }

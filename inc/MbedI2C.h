@@ -30,6 +30,8 @@ DEALINGS IN THE SOFTWARE.
 #include "CodalConfig.h"
 #include "codal-core/inc/driver-models/I2C.h"
 
+namespace mb = ::mbed;
+
 namespace codal
 {
     namespace _mbed
@@ -37,7 +39,7 @@ namespace codal
         /**
           * Class definition for I2C service, derived from ARM mbed.
           */
-        class I2C : public codal::I2C, public mbed::I2C
+        class I2C : public codal::I2C, private mb::I2C
         {
             public:
 
@@ -52,7 +54,7 @@ namespace codal
               */
             int setFrequency(uint32_t frequency);
 
-            /**
+              /**
               * Issues a standard, 2 byte I2C command write to the accelerometer.
               *
               * Blocks the calling thread until complete.
@@ -61,39 +63,31 @@ namespace codal
               *
               * @param value The value to write.
               *
-              * @return DEVICE_OK on success, DEVICE_I2C_ERROR if the the write request failed.
+              * @return DEVICE_OK on success, DEVICE_I2C_ERROR if the write request failed.
               */
-            int write(uint32_t address, uint8_t reg, uint8_t value);
+
+            int write(uint8_t data);
 
             /**
-              * Issues a standard, I2C command write to the specified address.
+              * Issues a single-byte read command.
               *
               * Blocks the calling thread until complete.
               *
-              * @param address The address of the device to write to.
-              *
-              * @param data The buffer to write.
-              *
-              * @param len The length of the buffer.
-              *
-              * @return DEVICE_OK on success, DEVICE_I2C_ERROR if the the write request failed.
+              * @return the byte on success or DEVICE_I2C_ERROR if the read request failed.
               */
-           int write(uint32_t address, uint8_t* data, uint32_t len, bool repeated = false);
+            int read(AcknowledgeType ack = AcknowledgeType::ACK);
+
+              /**
+             * Issues a START condition on the I2C bus
+             * @return DEVICE_OK on success, or an error code
+             */
+            int start();
 
             /**
-              * Issues a read command, copying data into the specified buffer.
-              *
-              * Blocks the calling thread until complete.
-              *
-              * @param reg The address of the register to access.
-              *
-              * @param buffer Memory area to read the data into.
-              *
-              * @param length The number of bytes to read.
-              *
-              * @return DEVICE_OK on success, DEVICE_INVALID_PARAMETER or DEVICE_I2C_ERROR if the the read request failed.
-              */
-            int read(uint32_t address, uint8_t reg, uint8_t* buffer, int length);
+             * Issues a STOP condition on the I2C bus
+             * @return DEVICE_OK on success, or an error code
+             */
+            int stop();
         };
     }
 }
