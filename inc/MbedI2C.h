@@ -52,7 +52,7 @@ namespace codal
               */
             int setFrequency(uint32_t frequency);
 
-             /**
+            /**
               * Issues a standard, 2 byte I2C command write to the accelerometer.
               *
               * Blocks the calling thread until complete.
@@ -75,7 +75,7 @@ namespace codal
               */
             int read(AcknowledgeType ack = AcknowledgeType::ACK);
 
-              /**
+            /**
              * Issues a START condition on the I2C bus
              * @return DEVICE_OK on success, or an error code
              */

@@ -67,7 +67,7 @@ namespace codal
             return (ret >= 0) ? DEVICE_OK : DEVICE_I2C_ERROR;
         }
 
-         /**
+        /**
           * Issues a single-byte read command.
           *
           * Blocks the calling thread until complete.
@@ -80,7 +80,7 @@ namespace codal
             return (ret >= 0) ? ret : DEVICE_I2C_ERROR;
         }
 
-          /**
+        /**
          * Issues a START condition on the I2C bus
          * @return DEVICE_OK on success, or an error code
          */
@@ -90,7 +90,7 @@ namespace codal
             return DEVICE_OK;
         }
 
-         /**
+        /**
          * Issues a STOP condition on the I2C bus
          * @return DEVICE_OK on success, or an error code
          */
