@@ -191,7 +191,7 @@ namespace codal
               *
               *       Buffers aren't allocated until the first send or receive respectively.
               */
-            Serial(PinName tx, PinName rx, uint8_t rxBufferSize = CODAL_SERIAL_DEFAULT_BUFFER_SIZE, uint8_t txBufferSize = CODAL_SERIAL_DEFAULT_BUFFER_SIZE);
+            Serial(codal::Pin& tx, codal::Pin& rx, uint8_t rxBufferSize = CODAL_SERIAL_DEFAULT_BUFFER_SIZE, uint8_t txBufferSize = CODAL_SERIAL_DEFAULT_BUFFER_SIZE);
 
             /**
               * Sends a single character over the serial line.

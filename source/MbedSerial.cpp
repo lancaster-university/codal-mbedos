@@ -58,7 +58,7 @@ namespace codal
           *
           *       Buffers aren't allocated until the first send or receive respectively.
           */
-        Serial::Serial(PinName tx, PinName rx, uint8_t rxBufferSize, uint8_t txBufferSize) : codal::Serial(tx, rx), mbed::RawSerial(tx,rx)
+        Serial::Serial(Pin& tx, Pin& rx, uint8_t rxBufferSize, uint8_t txBufferSize) : codal::Serial(tx, rx), mbed::RawSerial((PinName)tx.name,(PinName)rx.name)
         {
             // + 1 so there is a usable buffer size, of the size the user requested.
             this->rxBuffSize = rxBufferSize + 1;
